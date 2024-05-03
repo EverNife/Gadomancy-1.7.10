@@ -274,7 +274,16 @@ public class TileInfusionClaw extends SynchronizedTileEntity implements ISidedIn
                 }
             }
 
-            AdvancedFakePlayer fakePlayer = new AdvancedFakePlayer((WorldServer) world, TileInfusionClaw.FAKE_UUID);
+            AdvancedFakePlayer fakePlayer = new AdvancedFakePlayer(
+                    (WorldServer) world,
+                    TileInfusionClaw.FAKE_UUID,
+                    "[GadomancyClaw]"
+            );
+            //Move the fake player to the same position
+            fakePlayer.posX = x;
+            fakePlayer.posY = y;
+            fakePlayer.posZ = z;
+
             this.loadResearch(fakePlayer);
 
             if (behavior.hasVisCost()) {
@@ -291,25 +300,31 @@ public class TileInfusionClaw extends SynchronizedTileEntity implements ISidedIn
                 this.im.setWorld((WorldServer) world);
             }
 
-            if (fakePlayer == null) {
-                makeo.gadomancy.common.Gadomancy.log.warn(
-                        "Infusion Claw was build inside of a protected area! You need to allow FakePlayers here!");
-                return;
-            }
-
             fakePlayer.setHeldItem(this.wandStack);
-            this.im.activateBlockOrUseItem(
-                    fakePlayer,
-                    world,
-                    this.wandStack,
-                    x,
-                    y,
-                    z,
-                    ForgeDirection.UP.ordinal(),
-                    0.5F,
-                    0.5F,
-                    0.5F);
-            this.addInstability(behavior);
+            try {
+                this.im.activateBlockOrUseItem(
+                        fakePlayer,
+                        world,
+                        this.wandStack,
+                        x,
+                        y,
+                        z,
+                        ForgeDirection.UP.ordinal(),
+                        0.5F,
+                        0.5F,
+                        0.5F);
+                this.addInstability(behavior);
+            }catch (Exception e){
+                makeo.gadomancy.common.Gadomancy.log.warn(
+                        String.format(
+                                "Trying to use Infusion Claw at a protected area [%s - %s %s %s]! You need to allow FakePlayers here!",
+                                world.getSaveHandler().getWorldDirectoryName(),
+                                x,
+                                y,
+                                z
+                        )
+                );
+            }
         }
     }
 
